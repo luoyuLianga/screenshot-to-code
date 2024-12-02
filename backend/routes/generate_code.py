@@ -32,6 +32,7 @@ from prompts.types import Stack
 # from utils import pprint_prompt
 from ws.constants import APP_ERROR_WEB_SOCKET_CODE  # type: ignore
 
+from backend.llm import stream_qwenvl_response_test
 
 router = APIRouter()
 
@@ -176,6 +177,8 @@ def get_from_settings_dialog_or_env(
 async def stream_code(websocket: WebSocket):
     await websocket.accept()
     print("Incoming websocket connection...")
+    # params: dict[str, str] = await websocket.receive_json()
+    # print("Received params:", params)  # 打印参数
 
     ## Communication protocol setup
     async def throw_error(
@@ -214,6 +217,7 @@ async def stream_code(websocket: WebSocket):
     openai_base_url = extracted_params.openai_base_url
     anthropic_api_key = extracted_params.anthropic_api_key
     should_generate_images = extracted_params.should_generate_images
+    qwenvl_api_key = "111222"
 
     # Auto-upgrade usage of older models
     code_generation_model = auto_upgrade_model(code_generation_model)
@@ -275,6 +279,8 @@ async def stream_code(websocket: WebSocket):
                     variant_models = ["openai", "openai"]
                 elif anthropic_api_key:
                     variant_models = ["anthropic", "anthropic"]
+                elif qwenvl_api_key:
+                    variant_models = ["qwenvl", "qwenvl"]
                 else:
                     await throw_error(
                         "No OpenAI or Anthropic API key found. Please add the environment variable OPENAI_API_KEY or ANTHROPIC_API_KEY to backend/.env or in the settings dialog. If you add it to .env, make sure to restart the backend server."
@@ -308,6 +314,18 @@ async def stream_code(websocket: WebSocket):
                                 api_key=anthropic_api_key,
                                 callback=lambda x, i=index: process_chunk(x, i),
                                 model=Llm.CLAUDE_3_5_SONNET_2024_06_20,
+                            )
+                        )
+
+                    elif model == "qwenvl":
+                        if qwenvl_api_key is None:
+                            await throw_error("qwenvl API key is missing.")
+                            raise Exception("qwenvl API key is missing.")
+
+                        tasks.append(
+                            stream_qwenvl_response_test(
+                                api_url="http://172.21.140.7:9011/v1/chat/completions",
+                                callback=lambda x: process_chunk(x, 0),
                             )
                         )
 

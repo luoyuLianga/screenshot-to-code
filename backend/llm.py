@@ -77,6 +77,67 @@ async def stream_openai_response(
 
     return full_response
 
+async def stream_qwenvl_response_test(
+    api_url: str,
+    callback: Callable[[str], Awaitable[None]],
+    model: str = "qwen2-vl",
+    max_tokens: int = 1024,
+    temperature: float = 0.5,
+) -> str:
+    """
+    调用 Qwen-VL 接口的测试方法，使用默认消息验证服务是否正常。
+    """
+    import aiohttp
+    import json
+
+    full_response = ""
+    async with aiohttp.ClientSession() as session:
+        # 默认测试请求体
+        payload = {
+            "model": model,
+            "messages": [
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": "这是什么?"},
+                        {
+                            "type": "image_url",
+                            "image_url": {
+                                "url": "https://qianwen-res.oss-cn-beijing.aliyuncs.com/Qwen-VL/assets/demo.jpeg"
+                            },
+                        },
+                    ],
+                }
+            ],
+            "max_tokens": max_tokens,
+            "temperature": temperature,
+        }
+
+        headers = {"Content-Type": "application/json"}
+
+        try:
+            async with session.post(api_url, json=payload, headers=headers) as response:
+                if response.status != 200:
+                    error_message = f"Error: {response.status}, {await response.text()}"
+                    raise Exception(error_message)
+
+                async for line in response.content:
+                    try:
+                        chunk = json.loads(line.decode("utf-8").strip())
+                        if "content" in chunk:
+                            content = chunk["content"]
+                            full_response += content
+                            await callback(content)
+                    except json.JSONDecodeError:
+                        print(f"Failed to parse line: {line.decode('utf-8')}")
+
+        except Exception as e:
+            print(f"Error while communicating with Qwen-VL: {e}")
+            raise
+
+    return full_response
+
+
 
 # TODO: Have a seperate function that translates OpenAI messages to Claude messages
 async def stream_claude_response(
