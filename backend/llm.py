@@ -96,6 +96,10 @@ async def stream_qwen_vl_response(
         "temperature": 0.0,
     }
 
+    print(
+        f"req params: {params}"
+    )
+
     # Add 'max_tokens' only if the model is a GPT4 vision or Turbo model
     if (
         model == Llm.GPT_4_VISION
