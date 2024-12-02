@@ -83,13 +83,13 @@ async def stream_qwen_vl_response(
     api_key: str,                         # sk-c9c01685640a459ab0a66c14f51d54a0
     base_url: str | None,                 # https://dashscope.aliyuncs.com/compatible-mode/v1
     callback: Callable[[str], Awaitable[None]],
-    model: Llm,         # qwen-vl-plus
+    model: str,         # qwen-vl-plus
 ) -> str:
     client = AsyncOpenAI(api_key=api_key, base_url=base_url)
 
     # Base parameters
     params = {
-        "model": model.value,
+        "model": model,
         "messages": messages,
         "stream": True,
         "timeout": 600,
