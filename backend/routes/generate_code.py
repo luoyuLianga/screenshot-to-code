@@ -20,6 +20,7 @@ from llm import (
     stream_claude_response,
     stream_claude_response_native,
     stream_openai_response,
+    stream_qwenvl_response_test,
 )
 from fs_logging.core import write_logs
 from mock_llm import mock_completion
@@ -31,8 +32,6 @@ from prompts.types import Stack
 
 # from utils import pprint_prompt
 from ws.constants import APP_ERROR_WEB_SOCKET_CODE  # type: ignore
-
-from backend.llm import stream_qwenvl_response_test
 
 router = APIRouter()
 
