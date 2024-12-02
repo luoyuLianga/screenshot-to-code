@@ -286,6 +286,7 @@ async def stream_code(websocket: WebSocket):
                     )
                     raise Exception("No OpenAI or Anthropic key")
 
+                print(f"variant_models {variant_models}")
                 tasks: List[Coroutine[Any, Any, str]] = []
                 for index, model in enumerate(variant_models):
                     if model == "openai":
@@ -323,7 +324,7 @@ async def stream_code(websocket: WebSocket):
 
                         tasks.append(
                             stream_qwenvl_response_test(
-                                api_url="http://172.21.140.7:9011/v1/chat/completions",
+                                api_url="https://huggingface.co/spaces/Qwen/Qwen-VL-Plus",
                                 callback=lambda x: process_chunk(x, 0),
                             )
                         )
