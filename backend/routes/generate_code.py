@@ -20,7 +20,7 @@ from llm import (
     stream_claude_response,
     stream_claude_response_native,
     stream_openai_response,
-    stream_qwenvl_response_test,
+    stream_qwen_vl_response,
 )
 from fs_logging.core import write_logs
 from mock_llm import mock_completion
