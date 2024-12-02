@@ -77,63 +77,48 @@ async def stream_openai_response(
 
     return full_response
 
-async def stream_qwenvl_response_test(
-    api_url: str,
+
+async def stream_qwen_vl_response(
+    messages: List[ChatCompletionMessageParam],
+    api_key: str,                         # sk-c9c01685640a459ab0a66c14f51d54a0
+    base_url: str | None,                 # https://dashscope.aliyuncs.com/compatible-mode/v1
     callback: Callable[[str], Awaitable[None]],
-    model: str = "qwen2-vl",
-    max_tokens: int = 1024,
-    temperature: float = 0.5,
+    model: Llm,         # qwen-vl-plus
 ) -> str:
-    """
-    调用 Qwen-VL 接口的测试方法，使用默认消息验证服务是否正常。
-    """
-    import aiohttp
-    import json
+    client = AsyncOpenAI(api_key=api_key, base_url=base_url)
 
+    # Base parameters
+    params = {
+        "model": model.value,
+        "messages": messages,
+        "stream": True,
+        "timeout": 600,
+        "temperature": 0.0,
+    }
+
+    # Add 'max_tokens' only if the model is a GPT4 vision or Turbo model
+    if (
+        model == Llm.GPT_4_VISION
+        or model == Llm.GPT_4_TURBO_2024_04_09
+        or model == Llm.GPT_4O_2024_05_13
+    ):
+        params["max_tokens"] = 4096
+
+    stream = await client.chat.completions.create(**params)  # type: ignore
     full_response = ""
-    async with aiohttp.ClientSession() as session:
-        # 默认测试请求体
-        payload = {
-            "model": model,
-            "messages": [
-                {
-                    "role": "user",
-                    "content": [
-                        {"type": "text", "text": "这是什么?"},
-                        {
-                            "type": "image_url",
-                            "image_url": {
-                                "url": "https://qianwen-res.oss-cn-beijing.aliyuncs.com/Qwen-VL/assets/demo.jpeg"
-                            },
-                        },
-                    ],
-                }
-            ],
-            "max_tokens": max_tokens,
-            "temperature": temperature,
-        }
+    async for chunk in stream:  # type: ignore
+        assert isinstance(chunk, ChatCompletionChunk)
+        if (
+            chunk.choices
+            and len(chunk.choices) > 0
+            and chunk.choices[0].delta
+            and chunk.choices[0].delta.content
+        ):
+            content = chunk.choices[0].delta.content or ""
+            full_response += content
+            await callback(content)
 
-        headers = {"Content-Type": "application/json"}
-
-        try:
-            async with session.post(api_url, json=payload, headers=headers) as response:
-                if response.status != 200:
-                    error_message = f"Error: {response.status}, {await response.text()}"
-                    raise Exception(error_message)
-
-                async for line in response.content:
-                    try:
-                        chunk = json.loads(line.decode("utf-8").strip())
-                        if "content" in chunk:
-                            content = chunk["content"]
-                            full_response += content
-                            await callback(content)
-                    except json.JSONDecodeError:
-                        print(f"Failed to parse line: {line.decode('utf-8')}")
-
-        except Exception as e:
-            print(f"Error while communicating with Qwen-VL: {e}")
-            raise
+    await client.close()
 
     return full_response
 

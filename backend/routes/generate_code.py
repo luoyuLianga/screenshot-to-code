@@ -323,9 +323,12 @@ async def stream_code(websocket: WebSocket):
                             raise Exception("qwenvl API key is missing.")
 
                         tasks.append(
-                            stream_qwenvl_response_test(
-                                api_url="https://huggingface.co/spaces/Qwen/Qwen-VL-Plus",
-                                callback=lambda x: process_chunk(x, 0),
+                            stream_qwen_vl_response(
+                                prompt_messages,
+                                api_key="sk-c9c01685640a459ab0a66c14f51d54a0",
+                                base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
+                                callback=lambda x, i=index: process_chunk(x, i),
+                                model="qwen-vl-plus",
                             )
                         )
 
