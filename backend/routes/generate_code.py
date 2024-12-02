@@ -216,6 +216,7 @@ async def stream_code(websocket: WebSocket):
     openai_base_url = extracted_params.openai_base_url
     anthropic_api_key = extracted_params.anthropic_api_key
     should_generate_images = extracted_params.should_generate_images
+    should_generate_images = false
     qwenvl_api_key = "111222"
 
     # Auto-upgrade usage of older models

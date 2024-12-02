@@ -108,6 +108,9 @@ async def stream_qwen_vl_response(
     full_response = ""
     async for chunk in stream:  # type: ignore
         assert isinstance(chunk, ChatCompletionChunk)
+        print(
+            f"return res: {chunk}"
+        )
         if (
             chunk.choices
             and len(chunk.choices) > 0
