@@ -117,6 +117,8 @@ async def extract_params(
 
     # Validate the model_name
     model_name = params.get("ModelName")
+    if not model_name:
+        model_name = "qwen2-vl-7b-instruct"
 
     # Read the model from the request. Fall back to default if not provided.
     code_generation_model_str = params.get(
