@@ -329,7 +329,7 @@ async def stream_code(websocket: WebSocket):
                                 api_key="sk-c9c01685640a459ab0a66c14f51d54a0",
                                 base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
                                 callback=lambda x, i=index: process_chunk(x, i),
-                                model="qwen-vl-plus",
+                                model="qwen-vl-max",
                             )
                         )
 
