@@ -95,6 +95,7 @@ class ExtractedParams:
     openai_api_key: str | None
     anthropic_api_key: str | None
     openai_base_url: str | None
+    model_name: str
 
 
 async def extract_params(
@@ -113,6 +114,9 @@ async def extract_params(
         await throw_error(f"Invalid input mode: {input_mode}")
         raise ValueError(f"Invalid input mode: {input_mode}")
     validated_input_mode = cast(InputMode, input_mode)
+
+    # Validate the model_name
+    model_name = params.get("ModelName")
 
     # Read the model from the request. Fall back to default if not provided.
     code_generation_model_str = params.get(
@@ -154,6 +158,7 @@ async def extract_params(
         openai_api_key=openai_api_key,
         anthropic_api_key=anthropic_api_key,
         openai_base_url=openai_base_url,
+        model_name=model_name,
     )
 
 
@@ -217,6 +222,7 @@ async def stream_code(websocket: WebSocket):
     anthropic_api_key = extracted_params.anthropic_api_key
     should_generate_images = extracted_params.should_generate_images
     should_generate_images = False
+    model_name = extracted_params.model_name
     qwenvl_api_key = "111222"
 
     # Auto-upgrade usage of older models
@@ -287,7 +293,7 @@ async def stream_code(websocket: WebSocket):
                     )
                     raise Exception("No OpenAI or Anthropic key")
 
-                print(f"variant_models {variant_models}")
+                print(f"variant_models {variant_models},  model_name {model_name}")
                 tasks: List[Coroutine[Any, Any, str]] = []
                 for index, model in enumerate(variant_models):
                     if model == "openai":
@@ -329,7 +335,7 @@ async def stream_code(websocket: WebSocket):
                                 api_key="sk-c9c01685640a459ab0a66c14f51d54a0",
                                 base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
                                 callback=lambda x, i=index: process_chunk(x, i),
-                                model="qwen-vl-max",
+                                model=model_name,
                             )
                         )
 
