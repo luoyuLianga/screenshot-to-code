@@ -116,7 +116,7 @@ async def extract_params(
     validated_input_mode = cast(InputMode, input_mode)
 
     # Validate the model_name
-    model_name = params.get("ModelName")
+    model_name = params.get("modelName")
     if not model_name:
         model_name = "qwen2-vl-7b-instruct"
 
