@@ -6,7 +6,8 @@ import {
   SelectTrigger,
 } from "../ui/select";
 
-const MODEL_SELECTION: string[] = ["qwen-vl-v1", "qwen-vl-chat-v1", "qwen2-vl-7b-instruct", "qwen2-vl-2b-instruct"]
+const MODEL_SELECTION: string[] = ["qwen-vl-v1", "qwen-vl-chat-v1", "qwen2-vl-7b-instruct", "qwen2-vl-2b-instruct", 
+  "qwen-vl-plus", "qwen-vl-plus-latest", "qwen-max", "qwen-vl-max", "qwen-vl-max-latest"]
 
 interface Props {
   modelName: string | undefined;
