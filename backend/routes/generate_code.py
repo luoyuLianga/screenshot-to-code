@@ -334,7 +334,7 @@ async def stream_code(websocket: WebSocket):
                         tasks.append(
                             stream_qwen_vl_response(
                                 prompt_messages,
-                                api_key="sk-c9c01685640a459ab0a66c14f51d54a0",
+                                api_key="sk-4cb149f4f51240268508d110ed989691",
                                 base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
                                 callback=lambda x, i=index: process_chunk(x, i),
                                 model=model_name,
