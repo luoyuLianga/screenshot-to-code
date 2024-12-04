@@ -168,7 +168,7 @@ function ImageUpload({ setReferenceImages }: Props) {
         <div {...getRootProps({ style: style as any })}>
           <input {...getInputProps()} className="file-input" />
           <p className="text-slate-700 text-lg">
-            Drag & drop a screenshot here, <br />
+            Drag & drop a screenshot or design here, <br />
             or click to upload
           </p>
         </div>
